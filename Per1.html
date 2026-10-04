@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-[#fbfbfa]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-LKM Statistika Bivariat - Pertemuan 1 (Notion UI)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            notion: {
+              bg: '#fbfbfa',
+              card: '#ffffff',
+              border: '#e9e9e7',
+              text: '#37352f',
+              muted: '#787774',
+              calloutBg: '#f1f1ef',
+              greenBg: '#eefdf3',
+              greenText: '#18794e',
+              yellowBg: '#fefba8',
+              yellowText: '#8f4f00'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body { color: #37352f; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #fbfbfa; }
+    .notion-callout { border: 1px solid #e9e9e7; border-radius: 4px; padding: 12px 16px; background-color: #f1f1ef; }
+    .notion-input { border: 1px solid #e9e9e7; border-radius: 4px; padding: 8px 12px; background: #ffffff; font-size: 0.9rem; transition: all 0.1s ease; }
+    .notion-input:focus { outline: none; border-color: #2383e2; box-shadow: 0 0 0 2px rgba(35,131,226,0.15); }
+    canvas { touch-action: none; -webkit-tap-highlight-color: transparent; }
+    input[type=range] { accent-color: #37352f; }
+  </style>
+</head>
+
+<body class="min-h-full flex flex-col justify-between antialiased">
+
+  <!-- HEADER STICKY -->
+  <header class="sticky top-0 z-30 bg-[#fbfbfa]/95 backdrop-blur border-b border-[#e9e9e7] px-4 py-2.5">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <span class="text-lg">📄</span>
+        <div class="flex items-center gap-1.5 text-xs text-notion-muted">
+          <span>Matematika XI</span>
+          <span>/</span>
+          <span class="font-semibold text-notion-text">E-LKM Pertemuan 1</span>
+        </div>
+      </div>
+      
+      <!-- PROGRESS INDICATOR -->
+      <div class="w-full sm:w-auto flex items-center gap-3">
+        <div class="text-xs text-notion-muted font-medium">
+          <span id="stepLabel">Halaman 1 dari 5</span>
+        </div>
+        <div class="w-32 bg-[#edece9] h-1.5 rounded-full overflow-hidden">
+          <div id="progressBar" class="bg-[#37352f] h-full transition-all duration-300" style="width: 20%;"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-4xl w-full mx-auto px-4 sm:px-8 py-8 flex-grow">
+
+    <!-- PAGE 1: IDENTITAS & PANDUAN -->
+    <section id="p1" class="space-y-6">
+      <div class="space-y-3 pb-4 border-b border-[#e9e9e7]">
+        <div class="text-5xl">📊</div>
+        <h1 class="text-3xl font-bold tracking-tight text-[#37352f]">E-LKM: Menginterpretasikan Diagram Pencar</h1>
+        <p class="text-notion-muted text-sm">Analisis Arah & Bentuk Tren Data Pembangunan Kota Yogyakarta Menggunakan Sintaks <b>Think-Pair-Share (TPS)</b>.</p>
+      </div>
+
+      <div class="notion-callout flex items-start gap-3 text-sm">
+        <span class="text-xl">💡</span>
+        <div class="space-y-1">
+          <p class="font-semibold">Petunjuk Alur Pembelajaran:</p>
+          <ul class="list-disc list-inside text-notion-muted space-y-0.5 text-xs sm:text-sm">
+            <li><b>Think (Mandiri):</b> Atur kemiringan & posisi garis perkiraanmu pada grafik dari posisi awal 0.</li>
+            <li><b>Pair (Berpasangan):</b> Evaluasi ke-3 grafik hasil buatanmu bersama pasangan.</li>
+            <li><b>Share (Pleno):</b> Sampaikan kesimpulan pemaknaan kelompok di depan kelas.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border border-[#e9e9e7] rounded-md p-5 bg-white space-y-4">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-notion-muted flex items-center gap-2">
+          <span>👤</span> Profil Peserta Didik
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-notion-muted mb-1">Nama Lengkap</label>
+            <input id="nama" type="text" placeholder="Tulis nama siswa..." class="w-full notion-input">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-notion-muted mb-1">Nomor Absen</label>
+            <input id="absen" type="number" placeholder="Nomor absen" class="w-full notion-input">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-notion-muted mb-1">Nama Pasangan Diskusi (Pair)</label>
+          <input id="pasangan" type="text" placeholder="Nama teman pasanganmu..." class="w-full notion-input">
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="go(2)" class="bg-[#37352f] hover:bg-[#232320] text-white font-medium text-xs px-5 py-2.5 rounded transition flex items-center gap-2">
+          <span>Lanjut ke Tahap 1: Think</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 2: THINK (INDIVIDUAL) -->
+    <section id="p2" class="space-y-6 hidden">
+      <div class="border-b border-[#e9e9e7] pb-3">
+        <div class="inline-block px-2 py-0.5 bg-[#f1f1ef] text-notion-muted rounded text-xs font-bold uppercase tracking-wider mb-1">Tahap 1 · Think</div>
+        <h1 class="text-2xl font-bold">Berpikir Mandiri (Individual)</h1>
+        <p class="text-notion-muted text-xs sm:text-sm">Garis awal dimulai dari posisi 0. Geser slider kemiringan dan posisi untuk menempatkan garis <i>best fit</i> perkiraanmu!</p>
+      </div>
+
+      <!-- KASUS 1 (KUAT-TURUN) -->
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-4">
+        <h3 class="font-bold text-sm text-[#37352f] flex items-center gap-2 border-b border-[#f1f1ef] pb-2">
+          <span>🔹</span> Kasus 1: PDB Kota Jogja vs Persentase Buta Huruf (2020–2025)
+        </h3>
+
+        <div class="bg-[#f7f7f5] p-3 rounded border border-[#e9e9e7] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Kemiringan Garis (Slope):</span>
+              <span id="valSlope1">0.00</span>
+            </div>
+            <input id="slope1" type="range" min="-1.8" max="1.8" step="0.05" value="0" class="w-full">
+          </div>
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Posisi Vertikal (Naik / Turun):</span>
+              <span id="valPos1">0.00</span>
+            </div>
+            <input id="pos1" type="range" min="-0.3" max="0.3" step="0.01" value="0" class="w-full">
+          </div>
+        </div>
+
+        <div class="relative w-full aspect-[16/9] bg-white rounded border border-[#e9e9e7] overflow-hidden">
+          <canvas id="c1" class="w-full h-full block"></canvas>
+        </div>
+
+        <div class="space-y-3 pt-1">
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">1A. Arah Tren Data:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k1a" value="Negatif"> Miring ke bawah (Negatif)
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k1a" value="Positif"> Miring ke atas (Positif)
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k1a" value="Tidak Berpola"> Tidak Berpola
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">1B. Draf Pemaknaan Mandiri:</label>
+            <textarea id="ans1" rows="2" placeholder="Seiring meningkatnya PDB Kota Yogyakarta, persentase buta huruf cenderung..." class="w-full notion-input text-xs"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 2 (LEMAH-NAIK) -->
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-4">
+        <h3 class="font-bold text-sm text-[#37352f] flex items-center gap-2 border-b border-[#f1f1ef] pb-2">
+          <span>🔹</span> Kasus 2: Persentase Penduduk Miskin vs Buta Huruf (2020–2025)
+        </h3>
+
+        <div class="bg-[#f7f7f5] p-3 rounded border border-[#e9e9e7] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Kemiringan Garis (Slope):</span>
+              <span id="valSlope2">0.00</span>
+            </div>
+            <input id="slope2" type="range" min="-1.8" max="1.8" step="0.05" value="0" class="w-full">
+          </div>
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Posisi Vertikal (Naik / Turun):</span>
+              <span id="valPos2">0.00</span>
+            </div>
+            <input id="pos2" type="range" min="-0.3" max="0.3" step="0.01" value="0" class="w-full">
+          </div>
+        </div>
+
+        <div class="relative w-full aspect-[16/9] bg-white rounded border border-[#e9e9e7] overflow-hidden">
+          <canvas id="c2" class="w-full h-full block"></canvas>
+        </div>
+
+        <div class="space-y-3 pt-1">
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">2A. Arah Tren Data:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k2a" value="Positif"> Miring ke atas (Positif)
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k2a" value="Negatif"> Miring ke bawah (Negatif)
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k2a" value="Tidak Berpola"> Tidak Berpola
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">2B. Draf Pemaknaan Mandiri:</label>
+            <textarea id="ans2" rows="2" placeholder="Di wilayah dengan tingkat kemiskinan lebih tinggi, angka buta huruf..." class="w-full notion-input text-xs"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 3 (ACAK / VERTIKAL) -->
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-4">
+        <h3 class="font-bold text-sm text-[#37352f] flex items-center gap-2 border-b border-[#f1f1ef] pb-2">
+          <span>🔹</span> Kasus 3: Jumlah Penduduk vs Penduduk Miskin (2020–2025)
+        </h3>
+
+        <div class="bg-[#f7f7f5] p-3 rounded border border-[#e9e9e7] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Cobalah Kemiringan Garis (Slope):</span>
+              <span id="valSlope3">0.00</span>
+            </div>
+            <input id="slope3" type="range" min="-1.8" max="1.8" step="0.05" value="0" class="w-full">
+          </div>
+          <div>
+            <div class="flex justify-between font-semibold text-notion-muted mb-1">
+              <span>Posisi Vertikal (Naik / Turun):</span>
+              <span id="valPos3">0.00</span>
+            </div>
+            <input id="pos3" type="range" min="-0.3" max="0.3" step="0.01" value="0" class="w-full">
+          </div>
+        </div>
+
+        <div class="relative w-full aspect-[16/9] bg-white rounded border border-[#e9e9e7] overflow-hidden">
+          <canvas id="c3" class="w-full h-full block"></canvas>
+        </div>
+
+        <div class="space-y-3 pt-1">
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">3A. Saat mencoba menggeser garis di atas, apakah kamu bisa menemukan garis yang mewakili titik-titik tersebut secara seimbang?</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k3a" value="Bisa"> Bisa
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-[#e9e9e7] rounded bg-[#fafafa] cursor-pointer hover:bg-white">
+                <input type="radio" name="k3a" value="Sulit/Tidak Cocok"> Sulit / Tidak Cocok
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#37352f] mb-1">3B. Alasan Mandiri:</label>
+            <textarea id="ans3" rows="2" placeholder="Tuliskan alasanmu saat mencoba memasang garis pada titik-titik menumpuk ini..." class="w-full notion-input text-xs"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="go(3)" class="bg-[#37352f] hover:bg-[#232320] text-white font-medium text-xs px-5 py-2 rounded transition flex items-center gap-2">
+          <span>Lanjut ke Tahap Pair</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 3: PAIR (BERPASANGAN) -->
+    <section id="p3" class="space-y-6 hidden">
+      <div class="border-b border-[#e9e9e7] pb-3">
+        <div class="inline-block px-2 py-0.5 bg-[#eefdf3] text-[#18794e] rounded text-xs font-bold uppercase tracking-wider mb-1">Tahap 2 · Pair</div>
+        <h1 class="text-2xl font-bold">Diskusi Berpasangan & Critical Thinking</h1>
+        <p class="text-notion-muted text-xs sm:text-sm">Berikut adalah 3 grafik hasil percobaan garis yang kamu buat pada sesi <b>Think</b>. Evaluasi bersama pasanganmu!</p>
+      </div>
+
+      <div class="border border-[#e9e9e7] rounded-md p-4 bg-white space-y-4">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-notion-muted flex items-center gap-2">
+          <span>🔍</span> Evaluasi 3 Grafik Hasil Tebakan Garis Kamu
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-2">
+            <span class="text-xs font-bold text-[#37352f]">Kasus 1 (PDB vs Buta Huruf)</span>
+            <div class="relative w-full aspect-[4/3] bg-white rounded border border-[#e9e9e7]">
+              <canvas id="c1_pair" class="w-full h-full block"></canvas>
+            </div>
+            <div class="text-[11px] text-notion-muted bg-[#f7f7f5] p-2 rounded">
+              <b>Draf Awal:</b> <span id="recapAns1" class="italic">Belum diisi...</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-xs font-bold text-[#37352f]">Kasus 2 (Kemiskinan vs Buta Huruf)</span>
+            <div class="relative w-full aspect-[4/3] bg-white rounded border border-[#e9e9e7]">
+              <canvas id="c2_pair" class="w-full h-full block"></canvas>
+            </div>
+            <div class="text-[11px] text-notion-muted bg-[#f7f7f5] p-2 rounded">
+              <b>Draf Awal:</b> <span id="recapAns2" class="italic">Belum diisi...</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-xs font-bold text-[#37352f]">Kasus 3 (Penduduk vs Miskin)</span>
+            <div class="relative w-full aspect-[4/3] bg-white rounded border border-[#e9e9e7]">
+              <canvas id="c3_pair" class="w-full h-full block"></canvas>
+            </div>
+            <div class="text-[11px] text-notion-muted bg-[#f7f7f5] p-2 rounded">
+              <b>Draf Awal:</b> <span id="recapAns3" class="italic">Belum diisi...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-4">
+        <div class="notion-callout flex items-start gap-2 text-xs text-notion-muted">
+          <span>🤝</span>
+          <div>
+            <p class="font-bold text-[#37352f]">Diskusi Critical Thinking Pasangan:</p>
+            <p>Bandingkan Kasus 1, Kasus 2, dan Kasus 3! Mengapa Kasus 1 & 2 bisa dibentuk garis miring yang jelas, sedangkan Kasus 3 terasa memaksakan jika dibuat garis miring?</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#37352f] mb-1">Kesepakatan Pemaknaan Kasus 1 (PDB vs Buta Huruf):</label>
+          <textarea id="pairAns1" rows="2" placeholder="Tuliskan kalimat kesepakatan kalian berdua..." class="w-full notion-input text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#37352f] mb-1">Kesepakatan Pemaknaan Kasus 2 (Kemiskinan vs Buta Huruf):</label>
+          <textarea id="pairAns2" rows="2" placeholder="Tuliskan kalimat kesepakatan kalian berdua..." class="w-full notion-input text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#37352f] mb-1">Analisis Kritis Kasus 3 (Apakah Secara Teknis BISA Dibuat Garisnya, Tapi LAYAK/TIDAK Diterapkan?):</label>
+          <textarea id="pairAns3" rows="2" placeholder="Tuliskan alasan kritis kesepakatan pasanganmu..." class="w-full notion-input text-xs"></textarea>
+        </div>
+
+        <div class="pt-2 border-t border-[#f1f1ef] space-y-2">
+          <p class="text-xs font-bold text-notion-muted">Refleksi Kolaborasi:</p>
+          <label class="flex items-center gap-2 text-xs text-[#37352f] cursor-pointer">
+            <input id="chk1" type="checkbox" class="rounded border-[#e9e9e7]">
+            Kami berdua aktif mendiskusikan perbedaan ketiga grafik di atas.
+          </label>
+          <label class="flex items-center gap-2 text-xs text-[#37352f] cursor-pointer">
+            <input id="chk2" type="checkbox" class="rounded border-[#e9e9e7]">
+            Kami menyadari perbedaan antara garis yang 'Bisa Dibuat' dan garis yang 'Layak Digunakan'.
+          </label>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="go(4)" class="bg-[#37352f] hover:bg-[#232320] text-white font-medium text-xs px-5 py-2 rounded transition flex items-center gap-2">
+          <span>Lanjut ke Tahap Share</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 4: SHARE (PLENO KELAS) -->
+    <section id="p4" class="space-y-6 hidden">
+      <div class="border-b border-[#e9e9e7] pb-3">
+        <div class="inline-block px-2 py-0.5 bg-[#fefba8] text-[#8f4f00] rounded text-xs font-bold uppercase tracking-wider mb-1">Tahap 3 · Share</div>
+        <h1 class="text-2xl font-bold">Berbagi ke Kelas (Pleno)</h1>
+        <p class="text-notion-muted text-xs sm:text-sm">Siapkan presentasi 1 menit untuk membacakan pemaknaan Kasus 1, 2, dan temuan kritis Kasus 3!</p>
+      </div>
+
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-4">
+        <div class="notion-callout flex items-start gap-2 text-xs text-notion-muted">
+          <span>📢</span>
+          <div>
+            <p class="font-bold text-[#37352f]">Panduan Presentasi Singkat:</p>
+            <p>Sebutkan pemaknaan tren Kasus 1 & 2, serta jelaskan temuan kelompokmu mengenai Kasus 3!</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#37352f] mb-1">Catatan Umpan Balik / Perbaikan Kata dari Diskusi Kelas:</label>
+          <textarea id="shareNotes" rows="3" placeholder="Tuliskan saran atau masukan penyempurnaan kata dari guru atau pasangan lain..." class="w-full notion-input text-xs"></textarea>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <label class="flex items-center gap-2 text-xs text-[#37352f] cursor-pointer">
+            <input id="chkShare" type="checkbox" class="rounded border-[#e9e9e7]">
+            Saya/pasangan siap menyampaikan hasil analisis di depan kelas.
+          </label>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="go(5)" class="bg-[#37352f] hover:bg-[#232320] text-white font-medium text-xs px-5 py-2 rounded transition flex items-center gap-2">
+          <span>Lanjut ke Ringkasan Akhir</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 5: RINGKASAN & SUBMIT PERTEMUAN 1 -->
+    <section id="p5" class="space-y-6 hidden">
+      <div class="border-b border-[#e9e9e7] pb-3">
+        <div class="inline-block px-2 py-0.5 bg-[#f1f1ef] text-notion-muted rounded text-xs font-bold uppercase tracking-wider mb-1">Pertemuan 1 Selesai</div>
+        <h1 class="text-2xl font-bold">Ringkasan & Pengiriman Jawaban</h1>
+        <p class="text-notion-muted text-xs sm:text-sm">Silakan periksa kembali kelengkapan profilmu dan tekan tombol kirim di bawah ini!</p>
+      </div>
+
+      <div class="border border-[#e9e9e7] rounded-md p-4 sm:p-5 bg-white space-y-3">
+        <h2 class="font-bold text-xs uppercase tracking-wider text-notion-muted border-b border-[#f1f1ef] pb-2">Konfirmasi Pengiriman Pertemuan 1</h2>
+
+        <div class="text-xs space-y-1 text-[#37352f]">
+          <p><b>Nama:</b> <span id="summaryNama">-</span></p>
+          <p><b>Absen:</b> <span id="summaryAbsen">-</span></p>
+          <p><b>Pasangan:</b> <span id="summaryPasangan">-</span></p>
+        </div>
+
+        <div class="notion-callout bg-[#eefdf3] border-[#bbf7d0] text-xs text-[#18794e]">
+          🎉 Seluruh aktivitas eksplorasi TPS Pertemuan 1 telah lengkap. Tekan tombol hijau di bawah untuk membuat dan mengirimkan file dokumen HTML jawabanmu ke Folder Google Drive Guru!
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <button id="btnSubmit" onclick="saveAll()" class="w-full bg-[#18794e] hover:bg-[#13613e] text-white font-bold text-sm py-3.5 rounded transition flex items-center justify-center gap-2 shadow">
+          <span>🚀 Simpan File HTML Jawaban ke Google Drive Guru</span>
+        </button>
+        <div id="statusMsg" class="text-xs font-bold text-center"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-[#e9e9e7] bg-[#fbfbfa] py-4 text-center text-xs text-notion-muted">
+    <div class="max-w-4xl mx-auto px-4">
+      E-LKM Interaktif Statistika Bivariat · Model Think-Pair-Share (TPS) · Pertemuan 1
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT SCRIPT LENGKAP -->
+  <script>
+    // MASUKKAN URL GOOGLE APPS SCRIPT WEB APP HASIL DEPLOY AKUN GMAIL PRIBADI ANDA DI SINI
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxeBalDa3jzrhKkfyil6lILsRMiv3y8X_SgIQxR3f2c0RwidcS8DEkmo_o8SUcZ64FMQ/exec";
+
+    // Data Riil Kota Yogyakarta (2020-2025)
+    const d1 = [ {x:96, y:0.80}, {x:103, y:0.65}, {x:113, y:0.52}, {x:123, y:0.48}, {x:131, y:0.42}, {x:141, y:0.37} ];
+    const d2 = [ {x:7.27, y:0.80}, {x:7.69, y:0.65}, {x:6.62, y:0.52}, {x:6.49, y:0.48}, {x:6.26, y:0.42}, {x:6.14, y:0.37} ];
+    const d3 = [ {x:414, y:7.27}, {x:415, y:7.69}, {x:416, y:6.62}, {x:416, y:6.49}, {x:416, y:6.26}, {x:416, y:6.14} ];
+
+    const totalPages = 5;
+
+    function go(n) {
+      for(let i=1; i<=totalPages; i++) {
+        document.getElementById('p'+i).classList.add('hidden');
+      }
+      document.getElementById('p'+n).classList.remove('hidden');
+      
+      const pct = Math.round((n / totalPages) * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('stepLabel').textContent = `Halaman ${n} dari ${totalPages}`;
+      
+      window.scrollTo({top:0, behavior:'smooth'});
+
+      if(n === 2) {
+        setTimeout(renderAllThinkCanvas, 50);
+      } else if(n === 3) {
+        document.getElementById('recapAns1').textContent = document.getElementById('ans1').value || "Belum diisi...";
+        document.getElementById('recapAns2').textContent = document.getElementById('ans2').value || "Belum diisi...";
+        document.getElementById('recapAns3').textContent = document.getElementById('ans3').value || "Belum diisi...";
+        setTimeout(renderAllPairCanvas, 50);
+      } else if(n === 5) {
+        document.getElementById('summaryNama').textContent = document.getElementById('nama').value || "(Belum diisi)";
+        document.getElementById('summaryAbsen').textContent = document.getElementById('absen').value || "-";
+        document.getElementById('summaryPasangan').textContent = document.getElementById('pasangan').value || "-";
+      }
+    }
+
+    function renderAllThinkCanvas() {
+      const slope1 = parseFloat(document.getElementById('slope1').value);
+      const pos1 = parseFloat(document.getElementById('pos1').value);
+      document.getElementById('valSlope1').textContent = slope1.toFixed(2);
+      document.getElementById('valPos1').textContent = pos1.toFixed(2);
+
+      const slope2 = parseFloat(document.getElementById('slope2').value);
+      const pos2 = parseFloat(document.getElementById('pos2').value);
+      document.getElementById('valSlope2').textContent = slope2.toFixed(2);
+      document.getElementById('valPos2').textContent = pos2.toFixed(2);
+
+      const slope3 = parseFloat(document.getElementById('slope3').value);
+      const pos3 = parseFloat(document.getElementById('pos3').value);
+      document.getElementById('valSlope3').textContent = slope3.toFixed(2);
+      document.getElementById('valPos3').textContent = pos3.toFixed(2);
+
+      renderCanvasScaled('c1', d1, 'PDB (Juta Rp)', 'Buta Huruf (%)', slope1, pos1, [90, 150, 10], [0.3, 0.9, 0.1]);
+      renderCanvasScaled('c2', d2, 'Kemiskinan (%)', 'Buta Huruf (%)', slope2, pos2, [5.8, 8.0, 0.4], [0.3, 0.9, 0.1]);
+      renderCanvasScaled('c3', d3, 'Penduduk (Ribu)', 'Kemiskinan (%)', slope3, pos3, [413, 417, 1], [5.5, 8.0, 0.5]);
+    }
+
+    function renderAllPairCanvas() {
+      const slope1 = parseFloat(document.getElementById('slope1').value);
+      const pos1 = parseFloat(document.getElementById('pos1').value);
+      const slope2 = parseFloat(document.getElementById('slope2').value);
+      const pos2 = parseFloat(document.getElementById('pos2').value);
+      const slope3 = parseFloat(document.getElementById('slope3').value);
+      const pos3 = parseFloat(document.getElementById('pos3').value);
+
+      renderCanvasScaled('c1_pair', d1, 'PDB', 'Buta Huruf (%)', slope1, pos1, [90, 150, 20], [0.3, 0.9, 0.2]);
+      renderCanvasScaled('c2_pair', d2, 'Kemiskinan', 'Buta Huruf (%)', slope2, pos2, [5.8, 8.0, 0.8], [0.3, 0.9, 0.2]);
+      renderCanvasScaled('c3_pair', d3, 'Penduduk', 'Kemiskinan (%)', slope3, pos3, [413, 417, 2], [5.5, 8.0, 1.0]);
+    }
+
+    function renderCanvasScaled(id, data, labelX, labelY, slope, vertPos, rangeX, rangeY) {
+      const canvas = document.getElementById(id);
+      if(!canvas) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      
+      const w = rect.width;
+      const h = rect.height;
+      const padL = 50, padR = 20, padT = 20, padB = 35;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const minX = rangeX[0], maxX = rangeX[1], stepX = rangeX[2];
+      const minY = rangeY[0], maxY = rangeY[1], stepY = rangeY[2];
+
+      const mapX = val => padL + ((val - minX) / (maxX - minX)) * (w - padL - padR);
+      const mapY = val => h - padB - ((val - minY) / (maxY - minY)) * (h - padT - padB);
+
+      // GRID & TICKS Y
+      ctx.strokeStyle = '#e9e9e7';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#787774';
+      ctx.font = '9px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+
+      for(let yVal = minY; yVal <= maxY + 0.001; yVal += stepY) {
+        const yPos = mapY(yVal);
+        ctx.beginPath();
+        ctx.moveTo(padL, yPos);
+        ctx.lineTo(w - padR, yPos);
+        ctx.stroke();
+        ctx.fillText(yVal.toFixed(yVal % 1 === 0 ? 0 : 2), padL - 6, yPos + 3);
+      }
+
+      // GRID & TICKS X
+      ctx.textAlign = 'center';
+      for(let xVal = minX; xVal <= maxX + 0.001; xVal += stepX) {
+        const xPos = mapX(xVal);
+        ctx.beginPath();
+        ctx.moveTo(xPos, padT);
+        ctx.lineTo(xPos, h - padB);
+        ctx.stroke();
+        ctx.fillText(xVal.toFixed(xVal % 1 === 0 ? 0 : 1), xPos, h - padB + 14);
+      }
+
+      // AXES
+      ctx.strokeStyle = '#37352f';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+      ctx.stroke();
+
+      // LABELS
+      ctx.fillStyle = '#37352f';
+      ctx.font = 'bold 9px -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(labelY, padL - 10, padT - 8);
+      ctx.textAlign = 'right';
+      ctx.fillText(labelX, w - padR, h - padB + 28);
+
+      // BEST FIT LINE
+      if(slope !== null) {
+        const midX = (minX + maxX) / 2;
+        const midY = (minY + maxY) / 2 + vertPos * (maxY - minY);
+
+        const spanX = maxX - minX;
+        const spanY = maxY - minY;
+
+        const x1 = minX, y1 = midY - slope * (midX - minX) * (spanY / spanX);
+        const x2 = maxX, y2 = midY + slope * (maxX - midX) * (spanY / spanX);
+
+        ctx.strokeStyle = '#2383e2';
+        ctx.lineWidth = 2.2;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(mapX(x1), mapY(y1));
+        ctx.lineTo(mapX(x2), mapY(y2));
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // DATA POINTS
+      data.forEach(p => {
+        const cx = mapX(p.x);
+        const cy = mapY(p.y);
+
+        ctx.fillStyle = '#37352f';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+    }
+
+    ['slope1', 'pos1', 'slope2', 'pos2', 'slope3', 'pos3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderAllThinkCanvas);
+    });
+
+    async function saveAll() {
+      const nama = document.getElementById('nama');
+      const absen = document.getElementById('absen');
+      const statusEl = document.getElementById('statusMsg');
+      const btnSubmit = document.getElementById('btnSubmit');
+
+      if (!nama.value.trim() || !absen.value.trim()) {
+        statusEl.className = "text-xs font-bold text-center text-red-600";
+        statusEl.textContent = "❌ Lengkapi Nama dan Nomor Absen di Halaman 1 terlebih dahulu!";
+        return;
+      }
+
+      // Merekam state inputan & textarea murid ke atribut HTML permanen
+      document.querySelectorAll('input').forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          if (input.checked) input.setAttribute('checked', 'checked');
+          else input.removeAttribute('checked');
+        } else {
+          input.setAttribute('value', input.value);
+        }
+      });
+
+      document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.textContent = textarea.value;
+      });
+
+      // Tampilkan status indikator
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "⏳ Mengirim ke Drive...";
+      statusEl.className = "text-xs font-bold text-center text-blue-600";
+      statusEl.textContent = "Sedang menyimpan file HTML pengerjaan ke Google Drive...";
+
+      // Ambil dokumen HTML utuh besertaisinya
+      const fullHtmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+
+      // Pengiriman data menggunakan FormData + mode no-cors
+      const formData = new FormData();
+      formData.append('studentName', nama.value.trim());
+      formData.append('studentNumber', absen.value.trim());
+      formData.append('htmlContent', fullHtmlContent);
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        });
+
+        statusEl.className = "text-xs font-bold text-center text-[#18794e]";
+        statusEl.textContent = "✅ File HTML jawaban berhasil terkirim dan tersimpan di Google Drive Guru!";
+        btnSubmit.textContent = "✓ Sudah Disubmit & Tersimpan di Drive";
+        btnSubmit.classList.remove('bg-[#18794e]', 'hover:bg-[#13613e]');
+        btnSubmit.classList.add('bg-emerald-700', 'cursor-not-allowed');
+        alert('Terima kasih! File HTML jawaban Pertemuan 1 berhasil tersimpan di Google Drive Guru.');
+
+      } catch (error) {
+        console.error('Error Submit:', error);
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "🚀 Simpan File HTML Jawaban ke Google Drive Guru";
+        statusEl.className = "text-xs font-bold text-center text-red-600";
+        statusEl.textContent = "❌ Gagal mengunggah file ke Google Drive. Periksa jaringan internet.";
+        alert('Gagal mengirim file ke Google Drive. Coba lagi.');
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      renderAllThinkCanvas();
+      renderAllPairCanvas();
+    });
+
+    go(1);
+  </script>
+</body>
+</html>
